@@ -2,6 +2,8 @@
 
 namespace JsonEncoder\Serializer;
 
+use JsonEncoder\Strategy\JsonEncodeStrategy;
+
 class JsonEncodeSerializer implements \JsonSerializable {
     /**
      * @var mixed
