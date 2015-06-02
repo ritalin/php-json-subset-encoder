@@ -2,7 +2,7 @@
 
 namespace JsonEncoder\Strategy;
 
-class ArrayEncoderStrategy implements JsonEncodeStrategy {
+class ArrayEncodeStrategy implements JsonEncodeStrategy {
     /**
      * @var JsonEncodeStrategy
      */

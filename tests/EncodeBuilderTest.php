@@ -120,4 +120,139 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
             $result3
         );
     }
+    
+    /**
+     * @test
+     */
+    public function test_build_as_primitive_array() {
+        $builder = EncoderBuilder::AsPrimitiveArray();
+        
+        $this->assertInstanceOf(EncoderBuilder::class, $builder);
+        $this->assertInstanceOf(Strategy\ArrayEncodeStrategy::class, $builder->strategy());
+
+        $result = $builder->strategy()->serialize([11, 'xyz', 101, 987]);
+        
+        $this->assertEquals([11, 'xyz', 101, 987], $result);
+
+        $serializer = $builder->build([11, 'xyz', 101, 987]);
+        $result2 = $serializer->jsonSerialize();
+        
+        $this->assertEquals([11, 'xyz', 101, 987], $result2);
+        
+        $result3 = json_decode(json_encode($serializer), true);
+
+        $this->assertEquals([11, 'xyz', 101, 987], $result3);
+        
+    }
+    
+    /**
+     * @test
+     */
+    public function test_build_as_object_array() {
+        $meta = new ObjectMeta(Target\PublicClass::class, ['c', 'd']);
+
+        $builder = EncoderBuilder::AsObjectArray($meta);
+        
+        $this->assertInstanceOf(EncoderBuilder::class, $builder);
+        $this->assertInstanceOf(Strategy\ArrayEncodeStrategy::class, $builder->strategy());
+        
+        $obj = new Target\PublicClass(function($o) {
+            $o->a = 123;
+            $o->b = 'xyz';
+            $o->c = '@@@';
+            $o->d = 999;
+        });
+        
+        $values = [$obj, $obj, $obj];
+        
+        $result = $builder->strategy()->serialize($values);
+        
+        $this->assertEquals(
+            [
+                ['c' => '@@@', 'd' => 999],
+                ['c' => '@@@', 'd' => 999],
+                ['c' => '@@@', 'd' => 999],
+            ],
+            $result
+        );
+    
+        $serializer = $builder->build($values);
+        
+        $result2 = $serializer->jsonSerialize();
+        
+        $this->assertEquals(
+            [
+                ['c' => '@@@', 'd' => 999],
+                ['c' => '@@@', 'd' => 999],
+                ['c' => '@@@', 'd' => 999],
+            ],
+            $result2
+        );
+        
+        $result3 = json_decode(json_encode($serializer), true);
+        
+        $this->assertEquals(
+            [
+                ['c' => '@@@', 'd' => 999],
+                ['c' => '@@@', 'd' => 999],
+                ['c' => '@@@', 'd' => 999],
+            ],
+            $result3
+        );
+    }
+    
+    /**
+     * @test
+     */
+    public function test_build_as_nested_object_array() {
+        $meta = new ObjectMeta(Target\NestClass::class, ['b'], [
+            'obj' => new ObjectMeta(Target\PrivateClass::class, ['b', 'c', 'd'])
+        ]);
+
+        $builder = EncoderBuilder::AsObjectArray($meta);
+        
+        $this->assertInstanceOf(EncoderBuilder::class, $builder);
+        $this->assertInstanceOf(Strategy\ArrayEncodeStrategy::class, $builder->strategy());
+
+        $obj = new Target\NestClass(666, 'ghqazjk', new Target\PrivateClass(345, 'bbb', 'oop', 'ggg', '123'));
+        $values = [$obj, $obj, $obj, $obj];
+
+        $result = $builder->strategy()->serialize($values);
+
+        $this->assertEquals(
+            [
+                 [ 'b' => 'ghqazjk', 'obj' => [ 'b' => 'bbb', 'd' => 'ggg', ] ],
+                 [ 'b' => 'ghqazjk', 'obj' => [ 'b' => 'bbb', 'd' => 'ggg', ] ],
+                 [ 'b' => 'ghqazjk', 'obj' => [ 'b' => 'bbb', 'd' => 'ggg', ] ],
+                 [ 'b' => 'ghqazjk', 'obj' => [ 'b' => 'bbb', 'd' => 'ggg', ] ],
+            ],
+            $result
+        );
+    
+        $serializer = $builder->build($values);
+        
+        $result2 = $serializer->jsonSerialize();
+        
+        $this->assertEquals(
+            [
+                 [ 'b' => 'ghqazjk', 'obj' => [ 'b' => 'bbb', 'd' => 'ggg', ] ],
+                 [ 'b' => 'ghqazjk', 'obj' => [ 'b' => 'bbb', 'd' => 'ggg', ] ],
+                 [ 'b' => 'ghqazjk', 'obj' => [ 'b' => 'bbb', 'd' => 'ggg', ] ],
+                 [ 'b' => 'ghqazjk', 'obj' => [ 'b' => 'bbb', 'd' => 'ggg', ] ],
+            ],
+            $result2
+        );
+    
+        $result3 = json_decode(json_encode($serializer), true);
+        
+        $this->assertEquals(
+            [
+                 [ 'b' => 'ghqazjk', 'obj' => [ 'b' => 'bbb', 'd' => 'ggg', ] ],
+                 [ 'b' => 'ghqazjk', 'obj' => [ 'b' => 'bbb', 'd' => 'ggg', ] ],
+                 [ 'b' => 'ghqazjk', 'obj' => [ 'b' => 'bbb', 'd' => 'ggg', ] ],
+                 [ 'b' => 'ghqazjk', 'obj' => [ 'b' => 'bbb', 'd' => 'ggg', ] ],
+            ],
+            $result3
+        );
+    }
 }

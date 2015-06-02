@@ -118,7 +118,7 @@ class JsonEncoderStrategyTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
     public function test_primitive_array_strategy() {
-        $strategy = new Strategy\ArrayEncoderStrategy;
+        $strategy = new Strategy\ArrayEncodeStrategy;
         
         $result = $strategy->serialize([1, 1, 2, 3, 5]);
         $this->assertEquals([1, 1, 2, 3, 5], $result);
@@ -139,7 +139,7 @@ class JsonEncoderStrategyTest extends \PHPUnit_Framework_TestCase {
             'obj', new Strategy\ObjectSubsetStrategy(new Strategy\ObjectToArrayStrategy(['a', 'b', 'c']))
         );
 
-        $strategy = new Strategy\ArrayEncoderStrategy($objStrategy);
+        $strategy = new Strategy\ArrayEncodeStrategy($objStrategy);
         
         $values = [
             new Target\NestClass(777, 'ghjk', new Target\PrivateClass('aa', 'bb', 999, 12345, 'xyz')),

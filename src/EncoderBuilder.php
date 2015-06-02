@@ -9,6 +9,16 @@ final class EncoderBuilder {
         return new EncoderBuilder(static::createObjectStrategy($meta));
     }
     
+    public static function AsPrimitiveArray() {
+        return new EncoderBuilder(new Strategy\ArrayEncodeStrategy);
+    }
+    
+    public static function AsObjectArray(ObjectMeta $meta) {
+        return new EncoderBuilder(
+            new Strategy\ArrayEncodeStrategy(self::createObjectStrategy($meta))
+        );
+    }
+    
     private static function createObjectStrategy(ObjectMeta $meta) {
         $strategy = new Strategy\ObjectToArrayStrategy($meta->fields);
         
