@@ -19,15 +19,24 @@ final class EncoderBuilder {
         );
     }
     
+    public static function AsAssocArray(ObjectMeta $meta) {
+        return new EncoderBuilder(static::createObjectStrategy($meta));
+    }
+    
     private static function createObjectStrategy(ObjectMeta $meta) {
-        $strategy = new Strategy\ObjectToArrayStrategy($meta->fields);
+        if ($meta->class !== '') {
+            $strategy = new Strategy\ObjectToArrayStrategy($meta->fields);
         
-        if (count($meta->nestedMetas) > 0) {
-            $strategy = new Strategy\ObjectSubsetStrategy($strategy);
-            
-            foreach ($meta->nestedMetas as $field => $m) {
-                $strategy->append($field, static::createObjectStrategy($m));
+            if (count($meta->nestedMetas) > 0) {
+                $strategy = new Strategy\ObjectSubsetStrategy($strategy);
             }
+        }
+        else {
+            $strategy = new Strategy\AssocArrayEncodeStrategy($meta->fields);
+        }
+            
+        foreach ($meta->nestedMetas as $field => $m) {
+            $strategy->append($field, static::createObjectStrategy($m));
         }
         
         return $strategy;

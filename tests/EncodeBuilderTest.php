@@ -255,4 +255,30 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
             $result3
         );
     }
+    
+    /**
+     * @test
+     */
+    public function test_build_as_assoc_array() {
+        $meta = new ObjectMeta('', ['a'], [
+            'c' => new ObjectMeta(Target\PrivateClass::class, ['b', 'c'], [
+                'd' => new ObjectMeta('', ['x', 'y'])
+            ])
+        ]);
+
+        $builder = EncoderBuilder::AsAssocArray($meta);
+        
+        $this->assertInstanceOf(EncoderBuilder::class, $builder);
+        $this->assertInstanceOf(Strategy\AssocArrayEncodeStrategy::class, $builder->strategy());
+
+        $values = ['a' => 666, 'b' => 'ghqazjk', 'c' => new Target\PrivateClass(345, 'bbb', 'oop', ['x' => 100, 'y' => 200], '123')];
+
+        $result = $builder->strategy()->serialize($values);
+
+        $this->assertEquals(
+            [ 'a' => 666, 'c' => [ 'b' => 'bbb', 'd' => ['x' => 100, 'y' => 200], ] ],
+            $result
+        );
+    
+    }
 }

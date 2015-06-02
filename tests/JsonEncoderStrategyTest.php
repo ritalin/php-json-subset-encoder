@@ -167,4 +167,30 @@ class JsonEncoderStrategyTest extends \PHPUnit_Framework_TestCase {
             $result
         );
     }
+    
+    /**
+     * @test
+     */
+    public function test_assoc_array_strategy() {
+        $strategy = new Strategy\AssocArrayEncodeStrategy(['a']);
+        $strategy->append(
+            'b', new Strategy\ObjectSubsetStrategy(new Strategy\ObjectToArrayStrategy(['a', 'b', 'd'])) 
+        );
+        
+        $values = [ 
+            'a' => 777, 
+            'b' => new Target\PrivateClass('aa', 'bb', 999, 12345, 'xyz'), 
+            'c' => 'ghjk',
+        ];
+        
+        $result = $strategy->serialize($values);
+        
+        $this->assertEquals(
+            [
+                'a' => 777,
+                'b' => [ 'a' => 'aa', 'b' => 'bb', 'd' => 12345 ],
+            ], 
+            $result
+        );
+    }
 }
