@@ -279,6 +279,5 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
             [ 'a' => 666, 'c' => [ 'b' => 'bbb', 'd' => ['x' => 100, 'y' => 200], ] ],
             $result
         );
-    
     }
 }
