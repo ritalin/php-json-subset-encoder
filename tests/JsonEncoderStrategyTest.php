@@ -88,14 +88,16 @@ class JsonEncoderStrategyTest extends \PHPUnit_Framework_TestCase {
             'obj', new Strategy\ObjectSubsetStrategy(new Strategy\ObjectToArrayStrategy(['a', 'b', 'c']))
         );
         
-        $obj = new Target\NestClass;
-        $obj->a = 'qwerty';
-        $obj->b = 9876;
-        $obj->obj = new Target\PublicClass;
-        $obj->obj->a = 'aa';
-        $obj->obj->b = 'bb';
-        $obj->obj->c = 999;
-        $obj->obj->d = 12345;
+        $obj = new Target\NestClass(
+            'qwerty',
+            9876,
+            new Target\PublicClass(function ($o) {
+                $o->a = 'aa';
+                $o->b = 'bb';
+                $o->c = 999;
+                $o->d = 12345;
+            })
+        );
         
         $result = $strategy->serialize($obj);
         
@@ -132,9 +134,37 @@ class JsonEncoderStrategyTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
     public function test_nested_object_array_strategy() {
-        $strategy = new Strategy\ArrayEncoderStrategy(
-            
+        $objStrategy = new Strategy\ObjectSubsetStrategy(new Strategy\ObjectToArrayStrategy(['a']));
+        $objStrategy->append(
+            'obj', new Strategy\ObjectSubsetStrategy(new Strategy\ObjectToArrayStrategy(['a', 'b', 'c']))
         );
+
+        $strategy = new Strategy\ArrayEncoderStrategy($objStrategy);
         
+        $values = [
+            new Target\NestClass(777, 'ghjk', new Target\PrivateClass('aa', 'bb', 999, 12345, 'xyz')),
+            new Target\NestClass(666, 'ghqazjk', new Target\PrivateClass(345, 'bbb', 'oop', 'ggg', '123')),
+            new Target\NestClass('okm', 555, new Target\PrivateClass('aa2', 'bcd', 987, '@@@', 'high')),
+        ];
+        
+        $result = $strategy->serialize($values);
+        
+        $this->assertEquals(
+            [
+                [ 'a' => 777,
+                'obj' => [
+                    'a' => 'aa', 'b' => 'bb'
+                ]],
+                [ 'a' => 666,
+                'obj' => [
+                    'a' => 345, 'b' => 'bbb'
+                ]],
+                [ 'a' => 'okm',
+                'obj' => [
+                    'a' => 'aa2', 'b' => 'bcd'
+                ]],
+            ], 
+            $result
+        );
     }
 }

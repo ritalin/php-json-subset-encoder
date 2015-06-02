@@ -26,9 +26,9 @@ class ArrayEncoderStrategy implements JsonEncodeStrategy {
         if (is_object(current($value))) {
             return array_map(
                 function ($obj) {
-                    return new JsonSubsetObjectEncoder($obj, $fields);
+                    return $this->strategy->serialize($obj);
                 },
-                $this->values
+                $value
             );
         }
         else {
