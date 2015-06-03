@@ -50,17 +50,6 @@ class FilterRule {
     }
     
     /**
-     * @param string className
-     * @return FilterRule
-     */
-    public function includeProperties($className) {
-        $this->fields += array_flip($fieldNames);
-        $this->fieldAllIncludes = false;
-        
-        return $this;
-    }
-    
-    /**
      * @param string[] fieldNames
      * @return FilterRule
      */
