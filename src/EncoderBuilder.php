@@ -5,21 +5,21 @@ namespace JsonEncoder;
 use JsonEncoder\Strategy;
 
 final class EncoderBuilder {
-    public static function AsObject(ObjectMeta $meta) {
+    public static function asObject(ObjectMeta $meta) {
         return new EncoderBuilder(static::createObjectStrategy($meta));
     }
     
-    public static function AsPrimitiveArray() {
+    public static function asPrimitiveArray() {
         return new EncoderBuilder(new Strategy\ArrayEncodeStrategy);
     }
     
-    public static function AsObjectArray(ObjectMeta $meta) {
+    public static function asObjectArray(ObjectMeta $meta) {
         return new EncoderBuilder(
             new Strategy\ArrayEncodeStrategy(self::createObjectStrategy($meta))
         );
     }
     
-    public static function AsAssocArray(ObjectMeta $meta) {
+    public static function asAssocArray(ObjectMeta $meta) {
         return new EncoderBuilder(static::createObjectStrategy($meta));
     }
     

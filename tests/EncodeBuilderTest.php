@@ -17,7 +17,7 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
     public function test_build_as_object() {
         $meta = new ObjectMeta(Target\PublicClass::class, ['c', 'd']);
 
-        $builder = EncoderBuilder::AsObject($meta);
+        $builder = EncoderBuilder::asObject($meta);
         
         $this->assertInstanceOf(EncoderBuilder::class, $builder);
         $this->assertInstanceOf(Strategy\ObjectToArrayStrategy::class, $builder->strategy());
@@ -72,7 +72,7 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
             'obj' => new ObjectMeta(Target\PrivateClass::class, ['b', 'c', 'd'])
         ]);
         
-        $builder = EncoderBuilder::AsObject($meta);
+        $builder = EncoderBuilder::asObject($meta);
         
         $this->assertInstanceOf(EncoderBuilder::class, $builder);
         $this->assertInstanceOf(Strategy\ObjectSubsetStrategy::class, $builder->strategy());
@@ -125,7 +125,7 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
     public function test_build_as_primitive_array() {
-        $builder = EncoderBuilder::AsPrimitiveArray();
+        $builder = EncoderBuilder::asPrimitiveArray();
         
         $this->assertInstanceOf(EncoderBuilder::class, $builder);
         $this->assertInstanceOf(Strategy\ArrayEncodeStrategy::class, $builder->strategy());
@@ -151,7 +151,7 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
     public function test_build_as_object_array() {
         $meta = new ObjectMeta(Target\PublicClass::class, ['c', 'd']);
 
-        $builder = EncoderBuilder::AsObjectArray($meta);
+        $builder = EncoderBuilder::asObjectArray($meta);
         
         $this->assertInstanceOf(EncoderBuilder::class, $builder);
         $this->assertInstanceOf(Strategy\ArrayEncodeStrategy::class, $builder->strategy());
@@ -209,7 +209,7 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
             'obj' => new ObjectMeta(Target\PrivateClass::class, ['b', 'c', 'd'])
         ]);
 
-        $builder = EncoderBuilder::AsObjectArray($meta);
+        $builder = EncoderBuilder::asObjectArray($meta);
         
         $this->assertInstanceOf(EncoderBuilder::class, $builder);
         $this->assertInstanceOf(Strategy\ArrayEncodeStrategy::class, $builder->strategy());
@@ -266,7 +266,7 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
             ])
         ]);
 
-        $builder = EncoderBuilder::AsAssocArray($meta);
+        $builder = EncoderBuilder::asAssocArray($meta);
         
         $this->assertInstanceOf(EncoderBuilder::class, $builder);
         $this->assertInstanceOf(Strategy\AssocArrayEncodeStrategy::class, $builder->strategy());
