@@ -2,7 +2,7 @@
 
 namespace Test;
 
-use JsonEncoder\ObjectMeta;
+use JsonEncoder\FilterRule;
 use JsonEncoder\EncoderBuilder;
 
 use JsonEncoder\Strategy;
@@ -15,9 +15,9 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
     public function test_build_as_object() {
-        $meta = new ObjectMeta(Target\PublicClass::class, ['c', 'd']);
+        $meta = FilterRule::newFilter(['c', 'd']);
 
-        $builder = EncoderBuilder::asObject($meta);
+        $builder = EncoderBuilder::ofObject($meta);
         
         $this->assertInstanceOf(EncoderBuilder::class, $builder);
         $this->assertInstanceOf(Strategy\ObjectToArrayStrategy::class, $builder->strategy());
@@ -68,11 +68,11 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
     public function test_build_as_nested_object() {
-        $meta = new ObjectMeta(Target\NestClass::class, ['b'], [
-            'obj' => new ObjectMeta(Target\PrivateClass::class, ['b', 'c', 'd'])
+        $meta = FilterRule::newFilter(['b'], [
+            'obj' => FilterRule::newFilter(['b', 'c', 'd'])
         ]);
         
-        $builder = EncoderBuilder::asObject($meta);
+        $builder = EncoderBuilder::ofObject($meta);
         
         $this->assertInstanceOf(EncoderBuilder::class, $builder);
         $this->assertInstanceOf(Strategy\ObjectSubsetStrategy::class, $builder->strategy());
@@ -125,7 +125,7 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
     public function test_build_as_primitive_array() {
-        $builder = EncoderBuilder::asPrimitiveArray();
+        $builder = EncoderBuilder::ofPrimitiveArray();
         
         $this->assertInstanceOf(EncoderBuilder::class, $builder);
         $this->assertInstanceOf(Strategy\ArrayEncodeStrategy::class, $builder->strategy());
@@ -149,9 +149,9 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
     public function test_build_as_object_array() {
-        $meta = new ObjectMeta(Target\PublicClass::class, ['c', 'd']);
+        $meta = FilterRule::newFilter(['c', 'd']);
 
-        $builder = EncoderBuilder::asObjectArray($meta);
+        $builder = EncoderBuilder::ofObjectArray($meta);
         
         $this->assertInstanceOf(EncoderBuilder::class, $builder);
         $this->assertInstanceOf(Strategy\ArrayEncodeStrategy::class, $builder->strategy());
@@ -205,11 +205,11 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
     public function test_build_as_nested_object_array() {
-        $meta = new ObjectMeta(Target\NestClass::class, ['b'], [
-            'obj' => new ObjectMeta(Target\PrivateClass::class, ['b', 'c', 'd'])
+        $meta = FilterRule::newFilter(['b'], [
+            'obj' => FilterRule::newFilter(['b', 'c', 'd'])
         ]);
 
-        $builder = EncoderBuilder::asObjectArray($meta);
+        $builder = EncoderBuilder::ofObjectArray($meta);
         
         $this->assertInstanceOf(EncoderBuilder::class, $builder);
         $this->assertInstanceOf(Strategy\ArrayEncodeStrategy::class, $builder->strategy());
@@ -260,13 +260,13 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
     public function test_build_as_assoc_array() {
-        $meta = new ObjectMeta('', ['a'], [
-            'c' => new ObjectMeta(Target\PrivateClass::class, ['b', 'c'], [
-                'd' => new ObjectMeta('', ['x', 'y'])
+        $meta = FilterRule::newFilter(['a'], [
+            'c' => FilterRule::newFilter(['b', 'c'], [
+                'd' => FilterRule::newFilter(['x', 'y'])->withArrayRule()
             ])
-        ]);
+        ])->withArrayRule();
 
-        $builder = EncoderBuilder::asAssocArray($meta);
+        $builder = EncoderBuilder::ofAssocArray($meta);
         
         $this->assertInstanceOf(EncoderBuilder::class, $builder);
         $this->assertInstanceOf(Strategy\AssocArrayEncodeStrategy::class, $builder->strategy());

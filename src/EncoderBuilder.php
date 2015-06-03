@@ -5,38 +5,38 @@ namespace JsonEncoder;
 use JsonEncoder\Strategy;
 
 final class EncoderBuilder {
-    public static function asObject(ObjectMeta $meta) {
-        return new EncoderBuilder(static::createObjectStrategy($meta));
+    public static function ofObject(FilterRule $rule) {
+        return new EncoderBuilder(static::createObjectStrategy($rule));
     }
     
-    public static function asPrimitiveArray() {
+    public static function ofPrimitiveArray() {
         return new EncoderBuilder(new Strategy\ArrayEncodeStrategy);
     }
     
-    public static function asObjectArray(ObjectMeta $meta) {
+    public static function ofObjectArray(FilterRule $rule) {
         return new EncoderBuilder(
-            new Strategy\ArrayEncodeStrategy(self::createObjectStrategy($meta))
+            new Strategy\ArrayEncodeStrategy(self::createObjectStrategy($rule))
         );
     }
     
-    public static function asAssocArray(ObjectMeta $meta) {
-        return new EncoderBuilder(static::createObjectStrategy($meta));
+    public static function ofAssocArray(FilterRule $rule) {
+        return new EncoderBuilder(static::createObjectStrategy($rule));
     }
     
-    private static function createObjectStrategy(ObjectMeta $meta) {
-        if ($meta->class !== '') {
-            $strategy = new Strategy\ObjectToArrayStrategy($meta->fields);
+    private static function createObjectStrategy(FilterRule $rule) {
+        if ($rule->isObjectRule()) {
+            $strategy = new Strategy\ObjectToArrayStrategy($rule->fields);
         
-            if (count($meta->nestedMetas) > 0) {
+            if (count($rule->nestedFilters) > 0) {
                 $strategy = new Strategy\ObjectSubsetStrategy($strategy);
             }
         }
         else {
-            $strategy = new Strategy\AssocArrayEncodeStrategy($meta->fields);
+            $strategy = new Strategy\AssocArrayEncodeStrategy($rule->fields);
         }
             
-        foreach ($meta->nestedMetas as $field => $m) {
-            $strategy->append($field, static::createObjectStrategy($m));
+        foreach ($rule->nestedFilters as $field => $r) {
+            $strategy->append($field, static::createObjectStrategy($r));
         }
         
         return $strategy;
