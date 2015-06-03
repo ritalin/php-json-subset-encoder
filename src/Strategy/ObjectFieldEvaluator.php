@@ -69,20 +69,7 @@ final class ObjectFieldEvaluator {
         );
     }
     
-    public function listObjectFields() {
-        return array_keys(array_reduce(
-            array_keys($this->fields + $this->methods),
-            function (array &$tmp, $m) {
-                if ($m === '__construct') {
-                    return $tmp;
-                }
-                else if (($p = strpos($m, 'get')) === 0) {
-                    $m = lcfirst(substr($m, 3));
-                }
-                
-                return $tmp + [$m => null];
-            },
-            []
-        ));
+    public function listFields() {
+        return array_keys($this->fields);
     }
 }

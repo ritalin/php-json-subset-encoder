@@ -72,7 +72,7 @@ class JsonEncoderStrategyTest extends \PHPUnit_Framework_TestCase {
         
         $evaluator = new Strategy\ObjectFieldEvaluator($obj);
         
-        $this->assertEquals(['a' => 'aa', 'b' => 'bb', 'd' => 12345], $evaluator->evaluate($evaluator->listObjectFields()));
+        $this->assertEquals(['a' => 'aa', 'b' => 'bb', 'd' => 12345], $evaluator->evaluate(['a', 'b', 'c', 'd', 'e', 'f']));
     }
     
     /**

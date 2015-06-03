@@ -3,8 +3,8 @@
 namespace JsonEncoder;
 
 class FilterRule {
-    public static function newRule(array $nestedFilters = []) {
-        return new self($nestedFilters);
+    public static function newRule() {
+        return new self();
     }
     
     /**
@@ -40,6 +40,7 @@ class FilterRule {
     
     /**
      * @param string[] fieldNames
+     * @return FilterRule
      */
     public function includes(array $fieldNames) {
         $this->fields += array_flip($fieldNames);
@@ -49,7 +50,19 @@ class FilterRule {
     }
     
     /**
+     * @param string className
+     * @return FilterRule
+     */
+    public function includeProperties($className) {
+        $this->fields += array_flip($fieldNames);
+        $this->fieldAllIncludes = false;
+        
+        return $this;
+    }
+    
+    /**
      * @param string[] fieldNames
+     * @return FilterRule
      */
     public function excludes(array $fieldNames) {
         $this->excludeFields += array_flip($fieldNames);
@@ -60,6 +73,7 @@ class FilterRule {
     /**
      * @param string fieldName
      * @param FilterRule rule
+     * @return FilterRule
      */
     public function nestRule($fieldName, FilterRule $rule) {
         return $this->nestRules([$fieldName => $rule]);
@@ -67,6 +81,7 @@ class FilterRule {
     
     /**
      * @param FilterRule[] rules
+     * @return FilterRule
      */
     public function nestRules(array $rules) {
         $this->nestedFilters += $rules;

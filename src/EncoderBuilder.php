@@ -6,7 +6,7 @@ use JsonEncoder\Strategy;
 
 final class EncoderBuilder {
     public static function ofObject(FilterRule $rule) {
-        return new EncoderBuilder(static::createObjectStrategy($rule));
+        return new EncoderBuilder(static::createFieldStrategy($rule));
     }
     
     public static function ofPrimitiveArray() {
@@ -15,15 +15,15 @@ final class EncoderBuilder {
     
     public static function ofObjectArray(FilterRule $rule) {
         return new EncoderBuilder(
-            new Strategy\ArrayEncodeStrategy(self::createObjectStrategy($rule))
+            new Strategy\ArrayEncodeStrategy(self::createFieldStrategy($rule))
         );
     }
     
     public static function ofAssocArray(FilterRule $rule) {
-        return new EncoderBuilder(static::createObjectStrategy($rule));
+        return new EncoderBuilder(static::createFieldStrategy($rule));
     }
     
-    private static function createObjectStrategy(FilterRule $rule) {
+    private static function createFieldStrategy(FilterRule $rule) {
         if ($rule->isObjectRule()) {
             $strategy = new Strategy\ObjectToArrayStrategy($rule);
         
@@ -36,7 +36,7 @@ final class EncoderBuilder {
         }
             
         foreach ($rule->nestedFilters as $field => $r) {
-            $strategy->append($field, static::createObjectStrategy($r));
+            $strategy->append($field, static::createFieldStrategy($r));
         }
         
         return $strategy;
