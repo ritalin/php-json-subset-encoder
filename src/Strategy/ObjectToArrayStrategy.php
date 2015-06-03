@@ -3,6 +3,7 @@
 namespace JsonEncoder\Strategy;
 
 use JsonEncoder\FilterRule;
+use JsonEncoder\Formatter\ObjectFormatable;
 
 class ObjectToArrayStrategy implements JsonEncodeStrategy {
     /**
@@ -10,8 +11,20 @@ class ObjectToArrayStrategy implements JsonEncodeStrategy {
      */
     private $rule;
     
-    public function __construct(FilterRule $rule) {
+    /**
+     * @var ObjectFormatable[]
+     */
+    private $formatters;
+    
+    public function __construct(FilterRule $rule, array $formatters = []) {
         $this->rule = $rule;
+        $this->formatters = array_merge(self::defaultFormatters(), $formatters);
+    }
+    
+    private static function defaultFormatters() {
+        return [
+            \DateTime::class => new \JsonEncoder\Formatter\DateTimeFormatter
+        ];    
     }
     
     public function append($field, JsonEncodeStrategy $strategy) { }
@@ -25,7 +38,8 @@ class ObjectToArrayStrategy implements JsonEncodeStrategy {
         $evaluator = new ObjectFieldEvaluator($value);
 
         return $evaluator->evaluate(
-            $this->rule->isFieldAllIncludes() ? $evaluator->listFields() : $this->rule->listIncludeFields()
+            $this->rule->isFieldAllIncludes() ? $evaluator->listFields() : $this->rule->listIncludeFields(),
+            $this->formatters
         );
     }
 }

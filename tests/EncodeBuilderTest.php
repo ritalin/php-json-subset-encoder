@@ -66,6 +66,48 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
             $result3
         );
     }
+    /**
+     * @test
+     */
+    public function test_build_as_datetime() {
+        $rule = 
+            FilterRule::newRule()
+            ->includes(['a'])
+        ;
+        $builder = EncoderBuilder::ofObject($rule);
+
+        $obj = new Target\PublicClass(function($o) { 
+            $o->a = new \DateTime('2015/12/13 14:15:36', new \DateTimeZone('Asia/Tokyo')); 
+        });
+         
+        $result = $builder->strategy()->serialize($obj);
+        
+        $this->assertEquals(
+            [
+                'a' => '2015-12-13T14:15:36+0900',
+            ],
+            $result
+        );
+        
+        $serializer = $builder->build($obj);
+        $result2 = $serializer->jsonSerialize();
+        
+        $this->assertEquals(
+            [
+                'a' => '2015-12-13T14:15:36+0900',
+            ],
+            $result2
+        );
+        
+        $result3 = json_decode(json_encode($serializer), true);
+        
+        $this->assertEquals(
+            [
+                'a' => '2015-12-13T14:15:36+0900',
+            ],
+            $result3
+        );
+    }
     
     /**
      * @test

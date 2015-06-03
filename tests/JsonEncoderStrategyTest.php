@@ -78,6 +78,19 @@ class JsonEncoderStrategyTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
+    public function test_evaluate_field_with_formatting() {
+        $obj = new Target\PrivateClass(new \DateTime('2015/12/13 14:15:36', new \DateTimeZone('Asia/Tokyo')), 'bb', 999, 12345, 'xyz');
+        
+        $evaluator = new Strategy\ObjectFieldEvaluator($obj, []);
+        $formatter = new \JsonEncoder\Formatter\DateTimeFormatter;
+        
+        $this->assertEquals(['a' => '2015-12-13T14:15:36+0900', 'b' => 'bb'], $evaluator->evaluate(['a', 'b'], [\DateTime::class=>$formatter]));
+        
+    }
+    
+    /**
+     * @test
+     */
     public function test_private_object_to_array_strategy() {
         $strategy = new Strategy\ObjectToArrayStrategy($this->newRule(['b', 'a', 'd']));
         

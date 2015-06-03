@@ -57,16 +57,29 @@ final class ObjectFieldEvaluator {
         }
     }
     
-    public function evaluate(array $fields) {
+    /**
+     * @param string[] fields
+     * @param ObjectFormatter[] $formatters
+     */
+    public function evaluate(array $fields, array $formatters = []) {
         return array_reduce(
             $fields,
-            function (array &$tmp, $field) {
+            function (array &$tmp, $field) use($formatters) {
                 list($valid, $value) = $this->evaluateField($field);
                 
-                return $valid ? $tmp + [$field => $value] : $tmp;
+                return $valid ? $tmp + [$field => $this->applyFormatter($value, $formatters)] : $tmp;
             },
             []
         );
+    }
+    
+    private function applyFormatter($value, array $formatters) {
+        if (is_object($value) && isset($formatters[get_class($value)])) {
+            return $formatters[get_class($value)]->format($value);
+        }
+        else {
+            return $value;
+        }
     }
     
     public function listFields() {
