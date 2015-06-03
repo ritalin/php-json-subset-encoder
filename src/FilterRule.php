@@ -10,7 +10,7 @@ class FilterRule {
     /**
      * @var FilterRule[]
      */
-    public $nestedFilters;
+    public $nestedFilters = [];
     
     /**
      * @var string[]
@@ -20,7 +20,7 @@ class FilterRule {
     /**
      * @var string[]
      */
-    private $excludeFields;
+    private $excludeFields = [];
     
     /**
      * @var boolean
@@ -59,6 +59,24 @@ class FilterRule {
     }
     
     /**
+     * @param string fieldName
+     * @param FilterRule rule
+     */
+    public function nestRule($fieldName, FilterRule $rule) {
+        return $this->nestRules([$fieldName => $rule]);
+    }
+    
+    /**
+     * @param FilterRule[] rules
+     */
+    public function nestRules(array $rules) {
+        $this->nestedFilters += $rules;
+        $this->excludeFields += $rules;
+        
+        return $this;
+    }
+    
+    /**
      * @return boolean
      */
     public function isObjectRule() {
@@ -91,7 +109,5 @@ class FilterRule {
         return array_diff_key($values, $this->excludeFields);
     }
     
-    protected function __construct(array $nestedFilters) {
-        $this->excludeFields = $this->nestedFilters = $nestedFilters;
-    }
+    protected function __construct() { }
 }

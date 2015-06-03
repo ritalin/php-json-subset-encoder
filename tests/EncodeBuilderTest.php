@@ -15,9 +15,12 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
     public function test_build_as_object() {
-        $meta = FilterRule::newRule()->includes(['c', 'd']);
+        $rule = 
+            FilterRule::newRule()
+            ->includes(['c', 'd'])
+        ;
 
-        $builder = EncoderBuilder::ofObject($meta);
+        $builder = EncoderBuilder::ofObject($rule);
         
         $this->assertInstanceOf(EncoderBuilder::class, $builder);
         $this->assertInstanceOf(Strategy\ObjectToArrayStrategy::class, $builder->strategy());
@@ -68,11 +71,16 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
     public function test_build_as_nested_object() {
-        $meta = FilterRule::newRule([
-            'obj' => FilterRule::newRule()->includes(['b', 'c', 'd'])
-        ])->includes(['b']);
+        $rule = 
+            FilterRule::newRule()
+            ->includes(['b'])
+            ->nestRule('obj', 
+                FilterRule::newRule()
+                ->includes(['b', 'c', 'd'])
+            )
+        ;
         
-        $builder = EncoderBuilder::ofObject($meta);
+        $builder = EncoderBuilder::ofObject($rule);
         
         $this->assertInstanceOf(EncoderBuilder::class, $builder);
         $this->assertInstanceOf(Strategy\ObjectSubsetStrategy::class, $builder->strategy());
@@ -149,9 +157,12 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
     public function test_build_as_object_array() {
-        $meta = FilterRule::newRule()->includes(['c', 'd']);
+        $rule = 
+            FilterRule::newRule()
+            ->includes(['c', 'd'])
+        ;
 
-        $builder = EncoderBuilder::ofObjectArray($meta);
+        $builder = EncoderBuilder::ofObjectArray($rule);
         
         $this->assertInstanceOf(EncoderBuilder::class, $builder);
         $this->assertInstanceOf(Strategy\ArrayEncodeStrategy::class, $builder->strategy());
@@ -205,14 +216,16 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
     public function test_build_as_nested_object_array() {
-        $meta = 
-            FilterRule::newRule([
-                'obj' => FilterRule::newRule()->includes(['b', 'c', 'd'])
-            ])
+        $rule = 
+            FilterRule::newRule()
             ->includes(['b'])
+            ->nestRule('obj',
+                FilterRule::newRule()
+                ->includes(['b', 'c', 'd'])
+            )
         ;
 
-        $builder = EncoderBuilder::ofObjectArray($meta);
+        $builder = EncoderBuilder::ofObjectArray($rule);
         
         $this->assertInstanceOf(EncoderBuilder::class, $builder);
         $this->assertInstanceOf(Strategy\ArrayEncodeStrategy::class, $builder->strategy());
@@ -263,17 +276,20 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
     public function test_build_as_assoc_array() {
-        $meta = 
-            FilterRule::newRule([
-                'c' => FilterRule::newRule([
-                    'd' => FilterRule::newRule()->withArrayRule()->includes(['x', 'y'])
-                ])->includes(['b', 'c'])
-            ])
-            ->withArrayRule()
+        $rule = 
+            FilterRule::newRule()->withArrayRule()
             ->includes(['a'])
+            ->nestRule('c', 
+                FilterRule::newRule()
+                ->includes(['b', 'c'])
+                ->nestRule('d', 
+                    FilterRule::newRule()->withArrayRule()
+                    ->includes(['x', 'y'])
+                )
+            )
         ;
 
-        $builder = EncoderBuilder::ofAssocArray($meta);
+        $builder = EncoderBuilder::ofAssocArray($rule);
         
         $this->assertInstanceOf(EncoderBuilder::class, $builder);
         $this->assertInstanceOf(Strategy\AssocArrayEncodeStrategy::class, $builder->strategy());
