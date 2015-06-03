@@ -2,28 +2,58 @@
 
 namespace JsonEncoder;
 
-final class FilterRule {
-    /**
-     * @var string
-     */
-    public $isObjectRule = true;
-    
-    /**
-     * @var string[]
-     */
-    public $fields;
+class FilterRule {
+    public static function newRule(array $nestedFilters = []) {
+        return new self($nestedFilters);
+    }
     
     /**
      * @var FilterRule[]
      */
     public $nestedFilters;
     
-    public static function newFilter(array $fields, array $nestedFilters = []) {
-        return new self($fields, $nestedFilters);
-    }
+    /**
+     * @var string[]
+     */
+    private $fields = [];
+    
+    /**
+     * @var string[]
+     */
+    private $excludeFields;
+    
+    /**
+     * @var boolean
+     */
+    private $isObjectRule = true;
+    
+    /**
+     * @var boolean
+     */
+    private $fieldAllIncludes = true;
     
     public function withArrayRule() {
         $this->isObjectRule = false;
+        
+        return $this;
+    }
+    
+    /**
+     * @param string[] fieldNames
+     */
+    public function includes(array $fieldNames) {
+        $this->fields += array_flip($fieldNames);
+        $this->fieldAllIncludes = false;
+        
+        return $this;
+    }
+    
+    /**
+     * @param string[] fieldNames
+     */
+    public function excludes(array $fieldNames) {
+        $this->excludeFields += array_flip($fieldNames);
+        $this->fieldAllIncludes = false;
         
         return $this;
     }
@@ -35,8 +65,33 @@ final class FilterRule {
         return $this->isObjectRule;
     }
     
-    private function __construct(array $fields, array $nestedFilters) {
-        $this->fields = $fields;
-        $this->nestedFilters = $nestedFilters;
+    /**
+     * @return boolean
+     */
+    public function isFieldAllIncludes() {
+        return $this->fieldAllIncludes;
+    }
+    
+    /**
+     * @return string[]
+     */
+    public function listIncludeFields() {
+        return array_keys(array_diff_key($this->fields, $this->excludeFields));
+    }
+    
+    /**
+     * @param mixed[] values
+     * @return mixed[]
+     */
+    public function intersectByKey(array $values) {
+        if (! $this->fieldAllIncludes) {
+            $values = array_intersect_key($values, $this->fields);
+        }
+        
+        return array_diff_key($values, $this->excludeFields);
+    }
+    
+    protected function __construct(array $nestedFilters) {
+        $this->excludeFields = $this->nestedFilters = $nestedFilters;
     }
 }

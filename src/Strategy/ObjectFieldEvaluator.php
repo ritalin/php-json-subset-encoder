@@ -56,4 +56,33 @@ final class ObjectFieldEvaluator {
             return [false, null];
         }
     }
+    
+    public function evaluateAll() {
+        return array_reduce(
+            array_keys($this->extractGetters()),
+            function (array &$tmp, $field) {
+                list($valid, $value) = $this->evaluate($field);
+                
+                return $valid ? $tmp + [$field => $value] : $tmp;
+            },
+            []
+        );
+    }
+    
+    private function extractGetters() {
+        return array_reduce(
+            array_keys($this->fields + $this->methods),
+            function (array &$tmp, $m) {
+                if ($m === '__construct') {
+                    return $tmp;
+                }
+                else if (($p = strpos($m, 'get')) === 0) {
+                    $m = lcfirst(substr($m, 3));
+                }
+                
+                return $tmp + [$m => null];
+            },
+            []
+        );
+    }
 }

@@ -25,14 +25,14 @@ final class EncoderBuilder {
     
     private static function createObjectStrategy(FilterRule $rule) {
         if ($rule->isObjectRule()) {
-            $strategy = new Strategy\ObjectToArrayStrategy($rule->fields);
+            $strategy = new Strategy\ObjectToArrayStrategy($rule);
         
             if (count($rule->nestedFilters) > 0) {
                 $strategy = new Strategy\ObjectSubsetStrategy($strategy);
             }
         }
         else {
-            $strategy = new Strategy\AssocArrayEncodeStrategy($rule->fields);
+            $strategy = new Strategy\AssocArrayEncodeStrategy($rule);
         }
             
         foreach ($rule->nestedFilters as $field => $r) {

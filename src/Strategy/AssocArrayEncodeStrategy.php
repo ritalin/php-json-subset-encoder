@@ -2,6 +2,8 @@
 
 namespace JsonEncoder\Strategy;
 
+use JsonEncoder\FilterRule;
+
 class AssocArrayEncodeStrategy implements JsonEncodeStrategy {
     /**
      * @var JsonEncodeStrategy[]
@@ -9,12 +11,12 @@ class AssocArrayEncodeStrategy implements JsonEncodeStrategy {
     private $strategies = [];
     
     /**
-     * @var array
+     * @var FilterRule
      */
-    private $fields;
+    private $rule;
     
-    public function __construct(array $fields = []) {
-        $this->fields = array_flip($fields);
+    public function __construct(FilterRule $rule) {
+        $this->rule = $rule;
     }
     
     /**
@@ -30,7 +32,7 @@ class AssocArrayEncodeStrategy implements JsonEncodeStrategy {
     public function serialize($value) {
         if (! is_array($value)) return [];
     
-        $value1 = array_intersect_key($value, $this->fields);
+        $value1 = $this->rule->intersectByKey($value);
         $value2 = array_reduce(
             array_keys($this->strategies),
             function (&$tmp, $f) use($value) {

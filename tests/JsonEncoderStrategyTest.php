@@ -6,11 +6,15 @@ use Test\Target;
 use JsonEncoder\Strategy;
 
 class JsonEncoderStrategyTest extends \PHPUnit_Framework_TestCase {
+    private function newRule(array $fieldNames) {
+        return \JsonEncoder\FilterRule::newRule()->includes($fieldNames);
+    }
+    
     /**
      * @test
      */
     public function test_public_object_to_array_strategy() {
-        $strategy = new Strategy\ObjectToArrayStrategy(['b', 'a']);
+        $strategy = new Strategy\ObjectToArrayStrategy($this->newRule(['b', 'a']));
         
         $obj = new Target\PublicClass;
         $obj->a = 10;
@@ -63,8 +67,19 @@ class JsonEncoderStrategyTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
+    public function test_evaluate_object_field_all() {
+        $obj = new Target\PrivateClass('aa', 'bb', 999, 12345, 'xyz');
+        
+        $evaluator = new Strategy\ObjectFieldEvaluator($obj);
+        
+        $this->assertEquals(['a' => 'aa', 'b' => 'bb', 'd' => 12345], $evaluator->evaluateAll());
+    }
+    
+    /**
+     * @test
+     */
     public function test_private_object_to_array_strategy() {
-        $strategy = new Strategy\ObjectToArrayStrategy(['b', 'a', 'd']);
+        $strategy = new Strategy\ObjectToArrayStrategy($this->newRule(['b', 'a', 'd']));
         
         $obj = new Target\PrivateClass('aa', 'bb', 999, 12345, 'xyz');
         
@@ -83,9 +98,9 @@ class JsonEncoderStrategyTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
     public function test_object_subset_strategy() {
-        $strategy = new Strategy\ObjectSubsetStrategy(new Strategy\ObjectToArrayStrategy(['a']));
+        $strategy = new Strategy\ObjectSubsetStrategy(new Strategy\ObjectToArrayStrategy($this->newRule(['a'])));
         $strategy->append(
-            'obj', new Strategy\ObjectSubsetStrategy(new Strategy\ObjectToArrayStrategy(['a', 'b', 'c']))
+            'obj', new Strategy\ObjectSubsetStrategy(new Strategy\ObjectToArrayStrategy($this->newRule(['a', 'b', 'c'])))
         );
         
         $obj = new Target\NestClass(
@@ -134,9 +149,9 @@ class JsonEncoderStrategyTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
     public function test_nested_object_array_strategy() {
-        $objStrategy = new Strategy\ObjectSubsetStrategy(new Strategy\ObjectToArrayStrategy(['a']));
+        $objStrategy = new Strategy\ObjectSubsetStrategy(new Strategy\ObjectToArrayStrategy($this->newRule(['a'])));
         $objStrategy->append(
-            'obj', new Strategy\ObjectSubsetStrategy(new Strategy\ObjectToArrayStrategy(['a', 'b', 'c']))
+            'obj', new Strategy\ObjectSubsetStrategy(new Strategy\ObjectToArrayStrategy($this->newRule(['a', 'b', 'c'])))
         );
 
         $strategy = new Strategy\ArrayEncodeStrategy($objStrategy);
@@ -172,9 +187,9 @@ class JsonEncoderStrategyTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
     public function test_assoc_array_strategy() {
-        $strategy = new Strategy\AssocArrayEncodeStrategy(['a']);
+        $strategy = new Strategy\AssocArrayEncodeStrategy($this->newRule(['a']));
         $strategy->append(
-            'b', new Strategy\ObjectSubsetStrategy(new Strategy\ObjectToArrayStrategy(['a', 'b', 'd'])) 
+            'b', new Strategy\ObjectSubsetStrategy(new Strategy\ObjectToArrayStrategy($this->newRule(['a', 'b', 'd']))) 
         );
         
         $values = [ 

@@ -15,7 +15,7 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
     public function test_build_as_object() {
-        $meta = FilterRule::newFilter(['c', 'd']);
+        $meta = FilterRule::newRule()->includes(['c', 'd']);
 
         $builder = EncoderBuilder::ofObject($meta);
         
@@ -68,9 +68,9 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
     public function test_build_as_nested_object() {
-        $meta = FilterRule::newFilter(['b'], [
-            'obj' => FilterRule::newFilter(['b', 'c', 'd'])
-        ]);
+        $meta = FilterRule::newRule([
+            'obj' => FilterRule::newRule()->includes(['b', 'c', 'd'])
+        ])->includes(['b']);
         
         $builder = EncoderBuilder::ofObject($meta);
         
@@ -149,7 +149,7 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
     public function test_build_as_object_array() {
-        $meta = FilterRule::newFilter(['c', 'd']);
+        $meta = FilterRule::newRule()->includes(['c', 'd']);
 
         $builder = EncoderBuilder::ofObjectArray($meta);
         
@@ -205,9 +205,12 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
     public function test_build_as_nested_object_array() {
-        $meta = FilterRule::newFilter(['b'], [
-            'obj' => FilterRule::newFilter(['b', 'c', 'd'])
-        ]);
+        $meta = 
+            FilterRule::newRule([
+                'obj' => FilterRule::newRule()->includes(['b', 'c', 'd'])
+            ])
+            ->includes(['b'])
+        ;
 
         $builder = EncoderBuilder::ofObjectArray($meta);
         
@@ -260,11 +263,15 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
     public function test_build_as_assoc_array() {
-        $meta = FilterRule::newFilter(['a'], [
-            'c' => FilterRule::newFilter(['b', 'c'], [
-                'd' => FilterRule::newFilter(['x', 'y'])->withArrayRule()
+        $meta = 
+            FilterRule::newRule([
+                'c' => FilterRule::newRule([
+                    'd' => FilterRule::newRule()->withArrayRule()->includes(['x', 'y'])
+                ])->includes(['b', 'c'])
             ])
-        ])->withArrayRule();
+            ->withArrayRule()
+            ->includes(['a'])
+        ;
 
         $builder = EncoderBuilder::ofAssocArray($meta);
         
