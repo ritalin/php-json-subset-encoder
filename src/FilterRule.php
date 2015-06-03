@@ -53,7 +53,6 @@ class FilterRule {
      */
     public function excludes(array $fieldNames) {
         $this->excludeFields += array_flip($fieldNames);
-        $this->fieldAllIncludes = false;
         
         return $this;
     }
