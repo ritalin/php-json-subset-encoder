@@ -3,6 +3,7 @@
 namespace JsonEncoder\Serializer;
 
 use JsonEncoder\Strategy\JsonEncodeStrategy;
+use JsonEncoder\Formatter\ObjectFormatable;
 
 class JsonEncodeSerializer implements \JsonSerializable {
     /**
@@ -15,15 +16,21 @@ class JsonEncodeSerializer implements \JsonSerializable {
      */
     private $strategy;
     
-    public function __construct($value, JsonEncodeStrategy $strategy) {
+    /**
+     * @var ObjectFormatable[]
+     */
+    private $formatters;
+    
+    public function __construct($value, JsonEncodeStrategy $strategy, array $formatters) {
         $this->value = $value;
         $this->strategy = $strategy;
+        $this->formatters = $formatters;
     }
     
     /**
      * @return mixed
      */
     public function jsonSerialize() {
-        return $this->strategy->serialize($this->value);
+        return $this->strategy->serialize($this->value, $this->formatters);
     }
 }

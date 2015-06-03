@@ -8,4 +8,9 @@ interface ObjectFormatable {
      * @return string
      */
     function format($value);
+    
+    /**
+     * @return string
+     */
+    function type();
 }

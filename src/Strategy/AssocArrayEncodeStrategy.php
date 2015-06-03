@@ -3,6 +3,7 @@
 namespace JsonEncoder\Strategy;
 
 use JsonEncoder\FilterRule;
+use JsonEncoder\Formatter\ObjectFormatable;
 
 class AssocArrayEncodeStrategy implements JsonEncodeStrategy {
     /**
@@ -29,14 +30,14 @@ class AssocArrayEncodeStrategy implements JsonEncodeStrategy {
     /**
      * {inheritdoc}
      */
-    public function serialize($value) {
+    public function serialize($value, array $formatters) {
         if (! is_array($value)) return [];
     
         $value1 = $this->rule->intersectByKey($value);
         $value2 = array_reduce(
             array_keys($this->strategies),
-            function (&$tmp, $f) use($value) {
-                return isset($value[$f]) ? $tmp + [$f => $this->strategies[$f]->serialize($value[$f])] : $tmp;
+            function (&$tmp, $f) use($value, $formatters) {
+                return isset($value[$f]) ? $tmp + [$f => $this->strategies[$f]->serialize($value[$f], $formatters)] : $tmp;
             },
             []
         );

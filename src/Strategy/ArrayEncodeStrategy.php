@@ -2,6 +2,8 @@
 
 namespace JsonEncoder\Strategy;
 
+use JsonEncoder\Formatter\ObjectFormatable;
+
 class ArrayEncodeStrategy implements JsonEncodeStrategy {
     /**
      * @var JsonEncodeStrategy
@@ -20,13 +22,13 @@ class ArrayEncodeStrategy implements JsonEncodeStrategy {
     /**
      * {inheritdoc}
      */
-    public function serialize($value) {
+    public function serialize($value, array $formatters) {
         if (! is_array($value)) return[];
         
         if (is_object(current($value))) {
             return array_map(
-                function ($obj) {
-                    return $this->strategy->serialize($obj);
+                function ($obj) use($formatters) {
+                    return $this->strategy->serialize($obj, $formatters);
                 },
                 $value
             );

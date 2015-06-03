@@ -3,6 +3,7 @@
 namespace JsonEncoder;
 
 use JsonEncoder\Strategy;
+use JsonEncoder\Formatter;
 
 final class EncoderBuilder {
     public static function ofObject(FilterRule $rule) {
@@ -47,15 +48,31 @@ final class EncoderBuilder {
      */
     private $strategy;
     
+    /**
+     * Formatters\ObjectFormattable[]
+     */
+    private $formatters;
+    
     private function __construct(Strategy\JsonEncodeStrategy $strategy) {
         $this->strategy = $strategy;
+        $this->formatters = [
+            \DateTime::class => new \JsonEncoder\Formatter\DateTimeFormatter
+        ];
+    }
+    
+    public function formatWith(Formatters\ObjectFormattable $formatter) {
+        $this->formatters[$formatter->type()] = $formatter;
     }
     
     /**
      * @return JsonEncodeStrategy
      */
     public function strategy() {
-        return$this->strategy;
+        return $this->strategy;
+    }
+    
+    public function formatters() {
+        return $this->formatters;
     }
     
     /**
@@ -63,6 +80,6 @@ final class EncoderBuilder {
      * @return JsonEncodeSerializer
      */
     public function build($value) {
-        return new Serializer\JsonEncodeSerializer($value, $this->strategy);
+        return new Serializer\JsonEncodeSerializer($value, $this->strategy, $this->formatters);
     }
 }

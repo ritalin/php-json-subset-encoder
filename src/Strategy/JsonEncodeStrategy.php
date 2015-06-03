@@ -2,6 +2,8 @@
 
 namespace JsonEncoder\Strategy;
 
+use JsonEncoder\Formatter\ObjectFormatable;
+
 interface JsonEncodeStrategy {
     /**
      * @param string field
@@ -11,7 +13,8 @@ interface JsonEncodeStrategy {
     
     /**
      * @param mixed
+     * @param ObjectFormatable[]
      * @retuen mixed
      */
-    function serialize($value);
+    function serialize($value, array $formatters);
 }

@@ -22,7 +22,7 @@ class JsonEncoderStrategyTest extends \PHPUnit_Framework_TestCase {
         $obj->c = 1024;
         $obj->d = 99;
         
-        $result = $strategy->serialize($obj);
+        $result = $strategy->serialize($obj, []);
         
         $this->assertCount(2, $result);
         $this->assertArrayHasKey('a', $result);
@@ -96,7 +96,7 @@ class JsonEncoderStrategyTest extends \PHPUnit_Framework_TestCase {
         
         $obj = new Target\PrivateClass('aa', 'bb', 999, 12345, 'xyz');
         
-        $result = $strategy->serialize($obj);
+        $result = $strategy->serialize($obj, []);
         
         $this->assertCount(3, $result);
         $this->assertArrayHasKey('a', $result);
@@ -127,7 +127,7 @@ class JsonEncoderStrategyTest extends \PHPUnit_Framework_TestCase {
             })
         );
         
-        $result = $strategy->serialize($obj);
+        $result = $strategy->serialize($obj, []);
         
         $this->assertCount(2, $result);
         $this->assertArrayHasKey('a', $result);
@@ -148,13 +148,13 @@ class JsonEncoderStrategyTest extends \PHPUnit_Framework_TestCase {
     public function test_primitive_array_strategy() {
         $strategy = new Strategy\ArrayEncodeStrategy;
         
-        $result = $strategy->serialize([1, 1, 2, 3, 5]);
+        $result = $strategy->serialize([1, 1, 2, 3, 5], []);
         $this->assertEquals([1, 1, 2, 3, 5], $result);
         
-        $result = $strategy->serialize(['aa', 'bb', 'ac', 'dd', 'ee']);
+        $result = $strategy->serialize(['aa', 'bb', 'ac', 'dd', 'ee'], []);
         $this->assertEquals(['aa', 'bb', 'ac', 'dd', 'ee'], $result);
         
-        $result = $strategy->serialize(['aa', 'bb', 'ac', new Target\PublicClass, 1234]);
+        $result = $strategy->serialize(['aa', 'bb', 'ac', new Target\PublicClass, 1234], []);
         $this->assertEquals(['aa', 'bb', 'ac', new Target\PublicClass, 1234], $result);
     }
     
@@ -175,7 +175,7 @@ class JsonEncoderStrategyTest extends \PHPUnit_Framework_TestCase {
             new Target\NestClass('okm', 555, new Target\PrivateClass('aa2', 'bcd', 987, '@@@', 'high')),
         ];
         
-        $result = $strategy->serialize($values);
+        $result = $strategy->serialize($values, []);
         
         $this->assertEquals(
             [
@@ -211,7 +211,7 @@ class JsonEncoderStrategyTest extends \PHPUnit_Framework_TestCase {
             'c' => 'ghjk',
         ];
         
-        $result = $strategy->serialize($values);
+        $result = $strategy->serialize($values, []);
         
         $this->assertEquals(
             [

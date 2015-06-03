@@ -2,6 +2,8 @@
 
 namespace JsonEncoder\Strategy;
 
+use JsonEncoder\Formatter\ObjectFormatable;
+
 class ObjectSubsetStrategy implements JsonEncodeStrategy {
     /**
      * @var JsonEncodeStrategy[]
@@ -27,18 +29,18 @@ class ObjectSubsetStrategy implements JsonEncodeStrategy {
     /**
      * {inheritdoc}
      */
-    public function serialize($value) {
+    public function serialize($value, array $formatters) {
         if (! is_object($value)) return [];
     
         $evaluator = new ObjectFieldEvaluator($value);
         
-        $value1 = $this->builtin !== null ? $this->builtin->serialize($value) : [];
+        $value1 = $this->builtin !== null ? $this->builtin->serialize($value, $formatters) : [];
         $value2 = array_reduce(
             array_keys($this->strategies),
-            function (&$tmp, $f) use($evaluator) {
+            function (&$tmp, $f) use($evaluator, $formatters) {
                 list($valid, $v) = $evaluator->evaluateField($f);
                 
-                return $valid ? $tmp + [$f => $this->strategies[$f]->serialize($v)] : $tmp;
+                return $valid ? $tmp + [$f => $this->strategies[$f]->serialize($v, $formatters)] : $tmp;
             },
             []
         );

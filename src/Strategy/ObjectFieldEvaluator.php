@@ -2,6 +2,8 @@
 
 namespace JsonEncoder\Strategy;
 
+use JsonEncoder\Formatter\ObjectFormatable;
+
 final class ObjectFieldEvaluator {
     /**
      * @object

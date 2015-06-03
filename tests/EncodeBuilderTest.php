@@ -32,7 +32,7 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
             $o->d = 999;
         });
         
-        $result = $builder->strategy()->serialize($obj);
+        $result = $builder->strategy()->serialize($obj, $builder->formatters());
         
         $this->assertEquals(
             [
@@ -80,7 +80,7 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
             $o->a = new \DateTime('2015/12/13 14:15:36', new \DateTimeZone('Asia/Tokyo')); 
         });
          
-        $result = $builder->strategy()->serialize($obj);
+        $result = $builder->strategy()->serialize($obj, $builder->formatters());
         
         $this->assertEquals(
             [
@@ -129,7 +129,7 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
         
         $obj = new Target\NestClass(666, 'ghqazjk', new Target\PrivateClass(345, 'bbb', 'oop', 'ggg', '123'));
 
-        $result = $builder->strategy()->serialize($obj);
+        $result = $builder->strategy()->serialize($obj, $builder->formatters());
         
         $this->assertEquals(
             [
@@ -180,7 +180,7 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
         $this->assertInstanceOf(EncoderBuilder::class, $builder);
         $this->assertInstanceOf(Strategy\ArrayEncodeStrategy::class, $builder->strategy());
 
-        $result = $builder->strategy()->serialize([11, 'xyz', 101, 987]);
+        $result = $builder->strategy()->serialize([11, 'xyz', 101, 987], $builder->formatters());
         
         $this->assertEquals([11, 'xyz', 101, 987], $result);
 
@@ -218,7 +218,7 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
         
         $values = [$obj, $obj, $obj];
         
-        $result = $builder->strategy()->serialize($values);
+        $result = $builder->strategy()->serialize($values, $builder->formatters());
         
         $this->assertEquals(
             [
@@ -275,7 +275,7 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
         $obj = new Target\NestClass(666, 'ghqazjk', new Target\PrivateClass(345, 'bbb', 'oop', 'ggg', '123'));
         $values = [$obj, $obj, $obj, $obj];
 
-        $result = $builder->strategy()->serialize($values);
+        $result = $builder->strategy()->serialize($values, $builder->formatters());
 
         $this->assertEquals(
             [
@@ -338,7 +338,7 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
 
         $values = ['a' => 666, 'b' => 'ghqazjk', 'c' => new Target\PrivateClass(345, 'bbb', 'oop', ['x' => 100, 'y' => 200], '123')];
 
-        $result = $builder->strategy()->serialize($values);
+        $result = $builder->strategy()->serialize($values, $builder->formatters());
 
         $this->assertEquals(
             [ 'a' => 666, 'c' => [ 'b' => 'bbb', 'd' => ['x' => 100, 'y' => 200], ] ],

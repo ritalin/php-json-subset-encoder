@@ -11,14 +11,8 @@ class ObjectToArrayStrategy implements JsonEncodeStrategy {
      */
     private $rule;
     
-    /**
-     * @var ObjectFormatable[]
-     */
-    private $formatters;
-    
-    public function __construct(FilterRule $rule, array $formatters = []) {
+    public function __construct(FilterRule $rule) {
         $this->rule = $rule;
-        $this->formatters = array_merge(self::defaultFormatters(), $formatters);
     }
     
     private static function defaultFormatters() {
@@ -32,14 +26,14 @@ class ObjectToArrayStrategy implements JsonEncodeStrategy {
     /**
      * {inheritdoc}
      */
-    public function serialize($value) {
+    public function serialize($value, array $formatters) {
         if (! is_object($value)) return [];
         
         $evaluator = new ObjectFieldEvaluator($value);
 
         return $evaluator->evaluate(
             $this->rule->isFieldAllIncludes() ? $evaluator->listFields() : $this->rule->listIncludeFields(),
-            $this->formatters
+            $formatters
         );
     }
 }
