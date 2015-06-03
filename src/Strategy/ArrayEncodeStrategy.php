@@ -26,15 +26,29 @@ class ArrayEncodeStrategy implements JsonEncodeStrategy {
         if (! is_array($value)) return[];
         
         if (is_object(current($value))) {
-            return array_map(
-                function ($obj) use($formatters) {
-                    return $this->strategy->serialize($obj, $formatters);
-                },
-                $value
-            );
+            if ($this->strategy != null) {
+                return array_map(
+                    function ($obj) use($formatters) {
+                        return $this->strategy->serialize($obj, $formatters);
+                    },
+                    $value
+                );
+            }
+            else {
+                return array_map(
+                    function ($obj) use($formatters) {
+                        $class = get_class($obj);
+                        if (! isset($formatters[$class])) {
+                            throw new \Exception("formatter is not found (type: $class)");
+                        }
+                        
+                        return $formatters[$class]->format($obj);
+                    },
+                    $value
+                );
+            }
         }
-        else {
-            return $value;
-        }
+        
+        return $value;
     }
 }

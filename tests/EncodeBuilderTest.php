@@ -198,6 +198,28 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
+    public function test_build_as_datetime_array() {
+        $builder = EncoderBuilder::ofPrimitiveArray();
+        
+        $values = [
+            new \DateTime('2015/12/13 14:15:36', new \DateTimeZone('Asia/Tokyo')),
+            new \DateTime('2008/2/29 11:59:59', new \DateTimeZone('Asia/Tokyo'))
+        ];
+        
+        $result = $builder->strategy()->serialize($values, $builder->formatters());
+
+        $this->assertEquals(['2015-12-13T14:15:36+0900', '2008-02-29T11:59:59+0900'], $result);
+        
+        $serializer = $builder->build($values);
+        
+        $result2 = $serializer->jsonSerialize();
+
+        $this->assertEquals(['2015-12-13T14:15:36+0900', '2008-02-29T11:59:59+0900'], $result2);
+    }
+    
+    /**
+     * @test
+     */
     public function test_build_as_object_array() {
         $rule = 
             FilterRule::newRule()
@@ -344,5 +366,32 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
             [ 'a' => 666, 'c' => [ 'b' => 'bbb', 'd' => ['x' => 100, 'y' => 200], ] ],
             $result
         );
+    }
+    
+    /**
+     * @test
+     */
+    public function test_build_as_datetime_assoc_array() {
+        $rule = 
+            FilterRule::newRule()->withArrayRule()
+            ->includes(['b'])
+        ;
+        $builder = EncoderBuilder::ofAssocArray($rule);
+        
+        $values = [
+            'a' => new \DateTime('2015/12/13 14:15:36', new \DateTimeZone('Asia/Tokyo')),
+            'b' => new \DateTime('2008/2/29 11:59:59', new \DateTimeZone('Asia/Tokyo')),
+            'c' => new \DateTime('2000/11/10 9:8:7', new \DateTimeZone('Asia/Tokyo'))
+        ];
+        
+        $result = $builder->strategy()->serialize($values, $builder->formatters());
+
+        $this->assertEquals(['b' => '2008-02-29T11:59:59+0900'], $result);
+        
+        $serializer = $builder->build($values);
+        
+        $result2 = $serializer->jsonSerialize();
+
+        $this->assertEquals(['b' => '2008-02-29T11:59:59+0900'], $result2);
     }
 }
