@@ -57,11 +57,11 @@ class JsonEncoderStrategyTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($evaluator->hasGetter('getD'));
         $this->assertFalse($evaluator->hasGetter('getE'));
         
-        $this->assertEquals([true, 'aa'], $evaluator->evaluate('a'));
-        $this->assertEquals([true, 'bb'], $evaluator->evaluate('b'));
-        $this->assertEquals([false, null], $evaluator->evaluate('c'));
-        $this->assertEquals([true, 12345], $evaluator->evaluate('d'));
-        $this->assertEquals([false, null], $evaluator->evaluate('e'));
+        $this->assertEquals([true, 'aa'], $evaluator->evaluateField('a'));
+        $this->assertEquals([true, 'bb'], $evaluator->evaluateField('b'));
+        $this->assertEquals([false, null], $evaluator->evaluateField('c'));
+        $this->assertEquals([true, 12345], $evaluator->evaluateField('d'));
+        $this->assertEquals([false, null], $evaluator->evaluateField('e'));
     }
     
     /**
@@ -72,7 +72,7 @@ class JsonEncoderStrategyTest extends \PHPUnit_Framework_TestCase {
         
         $evaluator = new Strategy\ObjectFieldEvaluator($obj);
         
-        $this->assertEquals(['a' => 'aa', 'b' => 'bb', 'd' => 12345], $evaluator->evaluateAll());
+        $this->assertEquals(['a' => 'aa', 'b' => 'bb', 'd' => 12345], $evaluator->evaluate($evaluator->listObjectFields()));
     }
     
     /**

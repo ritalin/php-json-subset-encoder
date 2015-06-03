@@ -36,7 +36,7 @@ class ObjectSubsetStrategy implements JsonEncodeStrategy {
         $value2 = array_reduce(
             array_keys($this->strategies),
             function (&$tmp, $f) use($evaluator) {
-                list($valid, $v) = $evaluator->evaluate($f);
+                list($valid, $v) = $evaluator->evaluateField($f);
                 
                 return $valid ? $tmp + [$f => $this->strategies[$f]->serialize($v)] : $tmp;
             },

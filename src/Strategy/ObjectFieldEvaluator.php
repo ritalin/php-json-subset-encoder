@@ -42,7 +42,7 @@ final class ObjectFieldEvaluator {
         return array_key_exists($name, $this->methods);
     }
     
-    public function evaluate($field) {
+    public function evaluateField($field) {
         if ($this->hasField($field)) {
             return [true, $this->obj->{$field}];
         }
@@ -57,11 +57,11 @@ final class ObjectFieldEvaluator {
         }
     }
     
-    public function evaluateAll() {
+    public function evaluate(array $fields) {
         return array_reduce(
-            array_keys($this->extractGetters()),
+            $fields,
             function (array &$tmp, $field) {
-                list($valid, $value) = $this->evaluate($field);
+                list($valid, $value) = $this->evaluateField($field);
                 
                 return $valid ? $tmp + [$field => $value] : $tmp;
             },
@@ -69,8 +69,8 @@ final class ObjectFieldEvaluator {
         );
     }
     
-    private function extractGetters() {
-        return array_reduce(
+    public function listObjectFields() {
+        return array_keys(array_reduce(
             array_keys($this->fields + $this->methods),
             function (array &$tmp, $m) {
                 if ($m === '__construct') {
@@ -83,6 +83,6 @@ final class ObjectFieldEvaluator {
                 return $tmp + [$m => null];
             },
             []
-        );
+        ));
     }
 }
