@@ -174,6 +174,67 @@ class EncodeBuilderTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
+    public function test_build_as_nested_object_2() {
+        $rule = 
+            FilterRule::newRule()
+            ->nestRule('obj', 
+                FilterRule::newRule()
+                ->includes(['b', 'c', 'd'])
+            )
+        ;
+        
+        $builder = EncoderBuilder::ofObject($rule);
+        
+        $obj = new Target\NestClass(666, 'ghqazjk', new Target\PrivateClass(345, 'bbb', 'oop', 'ggg', '123'));
+
+        $result = $builder->strategy()->serialize($obj, $builder->formatters());
+        
+        $this->assertEquals(
+            [
+                'a' => 666,
+                'b' => 'ghqazjk',
+                'obj' => [
+                    'b' => 'bbb',
+                    'd' => 'ggg',
+                ]
+            ],
+            $result
+        );
+        
+        $serializer = $builder->build($obj);
+        
+        $result2 = $serializer->jsonSerialize();
+        
+        $this->assertEquals(
+            [
+                'a' => 666,
+                'b' => 'ghqazjk',
+                'obj' => [
+                    'b' => 'bbb',
+                    'd' => 'ggg',
+                ]
+            ],
+            $result2
+        );
+        
+        $result3 = json_decode(json_encode($serializer), true);
+        
+        $this->assertEquals(
+            [
+                'a' => 666,
+                'b' => 'ghqazjk',
+                'obj' => [
+                    'b' => 'bbb',
+                    'd' => 'ggg',
+                ]
+            ],
+            $result3
+        );
+    }
+    
+    /**
+     * @test
+     */
     public function test_build_as_primitive_array() {
         $builder = EncoderBuilder::ofPrimitiveArray();
         

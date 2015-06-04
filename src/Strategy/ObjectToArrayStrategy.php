@@ -30,10 +30,11 @@ class ObjectToArrayStrategy implements JsonEncodeStrategy {
         if (! is_object($value)) return [];
         
         $evaluator = new ObjectFieldEvaluator($value);
-
-        return $evaluator->evaluate(
-            $this->rule->isFieldAllIncludes() ? $evaluator->listFields() : $this->rule->listIncludeFields(),
-            $formatters
-        );
+        
+        if ($this->rule->isFieldAllIncludes()) {
+            $this->rule->includes($evaluator->listFields());
+        }
+        
+        return $evaluator->evaluate($this->rule->listIncludeFields(), $formatters);
     }
 }
